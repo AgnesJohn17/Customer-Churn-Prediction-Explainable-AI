@@ -17,6 +17,7 @@ from sklearn.metrics import (
 from sklearn.model_selection import StratifiedKFold, cross_val_score, train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from xgboost import XGBClassifier
 
 TARGET = "Churn"
 DROP = ("customerID",)
@@ -73,6 +74,10 @@ def train(data, output):
         "logistic_regression": LogisticRegression(max_iter=1500, class_weight="balanced"),
         "random_forest": RandomForestClassifier(
             n_estimators=200, min_samples_leaf=3, class_weight="balanced", random_state=42, n_jobs=-1),
+        "xgboost": XGBClassifier(n_estimators=200, max_depth=3, learning_rate=0.05,
+                                 subsample=0.85, colsample_bytree=0.9,
+                                 objective="binary:logistic", eval_metric="logloss",
+                                 random_state=42, n_jobs=2),
     }
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
     cv_results = {}
@@ -93,6 +98,11 @@ def train(data, output):
         results["held_out_test"][name] = scores(model, X_test, y_test)
     output.mkdir(parents=True, exist_ok=True)
     joblib.dump(fitted[winner], output / "churn_model.joblib")
+    # Holdout-only examples for explanation; never commit these customer rows.
+    joblib.dump({
+        "reference": X_train.sample(n=min(80, len(X_train)), random_state=17),
+        "explain": X_test.sample(n=min(40, len(X_test)), random_state=19),
+    }, output / "explanation_samples.joblib")
     joblib.dump({"features": X.columns.tolist(), "types": {
         col: ("numeric" if pd.api.types.is_numeric_dtype(X[col]) else "categorical")
         for col in X.columns}, "categories": {
