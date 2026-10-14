@@ -1,0 +1,36 @@
+name: Train and evaluate churn model
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'requirements.txt'
+      - '.github/workflows/train-evaluate.yml'
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - name: Download the public IBM sample dataset
+        run: |
+          mkdir -p data
+          curl --fail --location --retry 3 --output data/telco_churn.csv https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv
+          python -c "import pandas as pd; x=pd.read_csv('data/telco_churn.csv'); assert len(x)==7043, len(x); assert 'Churn' in x"
+      - name: Train and evaluate models
+        run: python src/train.py --data data/telco_churn.csv --output artifacts
+      - name: Compute SHAP explanations
+        run: python src/explain.py --artifacts artifacts
+      - name: Upload metrics and feature importance
+        uses: actions/upload-artifact@v4
+        with:
+          name: churn-evaluation
+          path: |
+            artifacts/metrics.json
+            artifacts/shap_importance.csv
+          retention-days: 30
