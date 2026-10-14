@@ -37,3 +37,15 @@ Churn is observational: feature relationships do not establish causes. The histo
 - [ ] Add SHAP explanations and interpretation tests
 - [ ] Deploy the Streamlit app
 - [ ] Document validated results and screenshots
+
+## Reproducible training and explainability
+
+A [GitHub Actions workflow](.github/workflows/train-evaluate.yml) downloads the public IBM dataset, verifies its 7,043-row count, trains/evaluates models, computes permutation SHAP explanations and uploads `metrics.json` / `shap_importance.csv` as a workflow artifact. Open **Actions → Train and evaluate churn model** to inspect the run. This is distinct from the unit-test workflow.
+
+Run locally:
+```bash
+python src/train.py --data data/telco_churn.csv --output artifacts
+python src/explain.py --artifacts artifacts
+```
+
+**Interpretation:** Model selection uses training-only cross-validation scored by average precision; test metrics use a separate held-out set. SHAP results describe model behavior, not causal explanations. Customer records and fitted artifacts are git-ignored. Real-world model accuracy and explanations must be reviewed from completed runs before quoting any measured performance.
