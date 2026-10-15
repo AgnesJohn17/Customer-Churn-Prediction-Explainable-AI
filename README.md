@@ -2,7 +2,7 @@
 
 Portfolio project predicting telecom customer churn, explaining risk drivers, and demonstrating a practical machine-learning workflow.
 
-**Status:** Implementation started. No performance numbers are claimed until training and evaluation have been run on the dataset.
+**Status:** Real-data training and SHAP evaluation succeeded on GitHub Actions. Streamlit app code supports automatic initial training; public deployment has not yet been verified.
 
 ## Dataset
 
@@ -33,8 +33,8 @@ Churn is observational: feature relationships do not establish causes. The histo
 
 ## Roadmap
 - [x] Project structure and training/evaluation scripts
-- [ ] Run against the full public dataset and verify metrics
-- [ ] Add SHAP explanations and interpretation tests
+- [x] Run against the full public dataset and verify metrics
+- [x] Generate SHAP global feature importance in GitHub Actions
 - [ ] Deploy the Streamlit app
 - [ ] Document validated results and screenshots
 
@@ -49,3 +49,13 @@ python src/explain.py --artifacts artifacts
 ```
 
 **Interpretation:** Model selection uses training-only cross-validation scored by average precision; test metrics use a separate held-out set. SHAP results describe model behavior, not causal explanations. Customer records and fitted artifacts are git-ignored. Real-world model accuracy and explanations must be reviewed from completed runs before quoting any measured performance.
+
+## Verified IBM Telco evaluation
+
+In the successful [training and SHAP workflow](https://github.com/AgnesJohn17/Customer-Churn-Prediction-Explainable-AI/actions/runs/38657594168), 7,043 customer records were split into 5,634 training and 1,409 test examples. Model selection used five-fold training-only average-precision cross-validation. **XGBoost** ranked highest (CV average precision **0.6694**). On the held-out test: **accuracy 80.48%, ROC-AUC 0.8470, precision 66.67%, recall 52.94%, average precision 0.6654**. At the default decision threshold, recall is limited; compare business tradeoffs before using a model in practice.
+
+The SHAP step completed successfully and identified **month-to-month contracts, tenure, fibre-optic internet and monthly charges** among the highest mean-absolute-impact encoded features. These are predictive associations, not proven causes of churn.
+
+## Streamlit app
+
+Run `streamlit run app.py` locally. On its first launch it downloads the 7,043-row IBM public dataset, trains the model if necessary, and caches it. First launch may take longer; internet access is needed. To deploy, connect this repo at [Streamlit Community Cloud](https://share.streamlit.io/) and set the main file to `app.py`. **Deployment is not yet verified.** No passwords or customer records should be committed to GitHub.
