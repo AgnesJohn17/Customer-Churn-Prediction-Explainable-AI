@@ -11,6 +11,7 @@ from train import train
 DATA_URL = "https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv"
 st.set_page_config(page_title="Telecom Churn Risk Explorer", page_icon="📊", layout="wide")
 st.title("Telecom Customer Churn Risk Explorer")
+st.markdown("Explore customer churn risk, compare validated machine-learning models, and discover predictive risk factors.")
 st.caption("Educational machine-learning demo using the public IBM Telco Customer Churn sample.")
 
 @st.cache_resource(show_spinner="Training and validating model on IBM telecom data (first launch)...")
@@ -74,6 +75,27 @@ if submitted:
     st.metric("Estimated churn probability", f"{probability:.1%}")
     st.progress(probability)
     st.caption("A prediction, not proof that a customer will leave. Do not use for consequential automated decisions.")
+
+st.divider()
+st.subheader("Model performance comparison")
+report = Path("reports/model_evaluation.csv")
+if report.exists():
+    table = pd.read_csv(report)
+    st.dataframe(table.rename(columns={
+        "Model": "Model", "ROC_AUC": "ROC-AUC", "Average_Precision": "Average precision"
+    }), hide_index=True, use_container_width=True)
+    st.caption("These scores come from a fixed stratified 20% hold-out test set, not the customer entered above.")
+
+st.subheader("What influences the model's predictions?")
+shap_file = Path("reports/shap_importance.csv")
+if shap_file.exists():
+    impact = pd.read_csv(shap_file).head(10).copy()
+    impact["feature"] = (impact["feature"]
+        .str.replace("categorical__", "", regex=False)
+        .str.replace("numeric__", "", regex=False)
+        .str.replace("_", " ", regex=False))
+    st.bar_chart(impact.set_index("feature")["mean_absolute_shap"], horizontal=True)
+    st.caption("Mean absolute SHAP values from a held-out customer sample. Higher values mean larger model impact, not a causal effect or direction of churn risk.")
 
 with st.expander("Model limitations and explanation"):
     st.write("This model captures historical associations, not causal drivers.")
