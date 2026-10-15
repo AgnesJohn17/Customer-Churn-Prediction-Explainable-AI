@@ -5,6 +5,7 @@ Run after training:
 
 This tests the app itself without exposing user/customer-level data.
 """
+from pathlib import Path
 from streamlit.testing.v1 import AppTest
 
 app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / "app.py"), default_timeout=120).run()
