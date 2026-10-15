@@ -7,7 +7,7 @@ This tests the app itself without exposing user/customer-level data.
 """
 from streamlit.testing.v1 import AppTest
 
-app = AppTest.from_file("app.py", default_timeout=120).run()
+app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / "app.py"), default_timeout=120).run()
 if len(app.exception):
     raise AssertionError("Streamlit failed during startup: " + str(app.exception))
 if not app.button:
