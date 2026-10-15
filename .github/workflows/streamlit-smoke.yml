@@ -1,0 +1,29 @@
+name: Streamlit end-to-end smoke test
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'app.py'
+      - 'src/**'
+      - 'scripts/smoke_test_app.py'
+      - 'requirements.txt'
+      - '.github/workflows/streamlit-smoke.yml'
+jobs:
+  app-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - name: Download IBM source dataset
+        run: |
+          mkdir -p data
+          curl --fail --location --retry 3 --output data/telco_churn.csv https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv
+      - name: Fit candidate models
+        run: python src/train.py --data data/telco_churn.csv --output artifacts
+      - name: Smoke test Streamlit interface
+        run: python scripts/smoke_test_app.py
