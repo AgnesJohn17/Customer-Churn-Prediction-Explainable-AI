@@ -1,0 +1,16 @@
+feature,mean_absolute_shap
+categorical__Contract_Month-to-month,0.080278
+numeric__tenure,0.065236
+categorical__InternetService_Fiber optic,0.035228
+numeric__MonthlyCharges,0.029593
+categorical__OnlineSecurity_No,0.026660
+categorical__PaymentMethod_Electronic check,0.022704
+categorical__PaperlessBilling_No,0.019770
+categorical__TechSupport_No,0.018637
+categorical__MultipleLines_No,0.018453
+categorical__Contract_Two year,0.015911
+numeric__TotalCharges,0.013317
+categorical__OnlineBackup_No,0.010693
+categorical__StreamingTV_Yes,0.008627
+categorical__StreamingMovies_Yes,0.007097
+numeric__SeniorCitizen,0.006345
