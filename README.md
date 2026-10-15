@@ -1,8 +1,10 @@
 # Customer Churn Prediction & Explainable AI
 
+**[🚀 Try the Live Streamlit App](https://customer-churn-prediction-explainable-ai-eycmnbvby7uikvbt6gy7p.streamlit.app/)** · [View validated GitHub Actions](https://github.com/AgnesJohn17/Customer-Churn-Prediction-Explainable-AI/actions) · [Model comparison](reports/model_evaluation.csv)
+
 Portfolio project predicting telecom customer churn, explaining risk drivers, and demonstrating a practical machine-learning workflow.
 
-**Status:** Real-data training and SHAP evaluation succeeded on GitHub Actions. Streamlit app code supports automatic initial training; public deployment has not yet been verified.
+**Status:** Public Streamlit deployment shared and shown running by the project owner. Automated unit tests, end-to-end Streamlit prediction smoke tests, training and global SHAP analysis passed on GitHub Actions. The live app retrains at startup; its exact metrics may vary slightly with installed dependency versions.
 
 ## Dataset
 
@@ -23,10 +25,10 @@ streamlit run app.py
 ## Approach
 - Prepare data in a leakage-aware, stratified train/test split.
 - Handle missing numeric values and one-hot encode categorical predictors inside sklearn pipelines.
-- Compare a majority-class baseline, Logistic Regression and Random Forest with accuracy, precision, recall, F1, ROC-AUC and average precision.
+- Compare a majority-class baseline, Logistic Regression, Random Forest and XGBoost with accuracy, precision, recall, F1, ROC-AUC and average precision.
 - Choose a model using cross-validation on training data, then report the held-out test results.
 - Make individual predictions with a Streamlit app using the trained preprocessing/model pipeline.
-- Add SHAP explainability once the models are validated.
+- Explain the selected model with global SHAP permutation feature importance.
 
 ## Notes
 Churn is observational: feature relationships do not establish causes. The historical sample is not representative of every telecom customer population. Avoid using customer identifiers as predictors.
@@ -35,8 +37,8 @@ Churn is observational: feature relationships do not establish causes. The histo
 - [x] Project structure and training/evaluation scripts
 - [x] Run against the full public dataset and verify metrics
 - [x] Generate SHAP global feature importance in GitHub Actions
-- [ ] Deploy the Streamlit app
-- [ ] Document validated results and screenshots
+- [x] Publish Streamlit app (owner-shared URL and screenshot)
+- [x] Document validated results and link live demo
 
 ## Reproducible training and explainability
 
@@ -58,4 +60,8 @@ The SHAP step completed successfully and identified **month-to-month contracts, 
 
 ## Streamlit app
 
-Run `streamlit run app.py` locally. On its first launch it downloads the 7,043-row IBM public dataset, trains the model if necessary, and caches it. First launch may take longer; internet access is needed. To deploy, connect this repo at [Streamlit Community Cloud](https://share.streamlit.io/) and set the main file to `app.py`. **Deployment is not yet verified.** No passwords or customer records should be committed to GitHub.
+Run `streamlit run app.py` locally. On its first launch it downloads the 7,043-row IBM public dataset, trains the model if necessary, and caches it. First launch may take longer; internet access is needed. **Public demo:** [Open the deployed application](https://customer-churn-prediction-explainable-ai-eycmnbvby7uikvbt6gy7p.streamlit.app/). The owner supplied this URL and a screenshot of the running app, and the repository's automated Streamlit launch-and-prediction test passed. The exact public endpoint was not independently exercised during this README update. To deploy independently, connect the repo at [Streamlit Community Cloud](https://share.streamlit.io/) and set the main file to `app.py`. No passwords or customer records should be committed to GitHub.
+
+## Internship portfolio summary
+
+Built an end-to-end telecom customer churn prediction application in **Python, pandas, scikit-learn, XGBoost, SHAP and Streamlit**, with a reproducible pipeline, five-fold cross-validation, held-out evaluation, and CI-based automated tests. On the 7,043-row IBM Telco dataset, the selected XGBoost model achieved **0.847 ROC-AUC and 80.48% accuracy** on the reference held-out evaluation. Published an interactive web app with individual churn-risk estimates, model comparisons and global SHAP feature-importance visualizations.
